@@ -46,39 +46,52 @@ void show(int **image, int length, int height);
 */
 void free(int **image, int &length, int &height);
 
+
+
 int main()
 {
   int length;
   int height;
-  load("./resource/image.txt",length, height);
-  cout<<length<<":";
-  cout<<height<<":";
-  cout<<endl;
+
+//  const string filename = "./resource/image.txt";
+  const string filename = "./resource/bad.txt";
+  int **image = load(filename,length, height);
+if(image!=0){
+  show(image, length, height);
+}
+
+
 }
 
 int **load(string imageFile, int &length, int &height)
 {
-
   ifstream inputfile(imageFile.c_str());
   if(inputfile.is_open()){
     inputfile >> length; //cin>>length
     inputfile >> height;
-    int **ret = new int*[height];
-      for(int row=0; row<height; row++){
-        //set the current row of the returning array to a new array for the data in the row
-        ret[row] = new int[length];
-        for(int col=0; col<length; col++){
-            inputfile>>ret[row][col];
-            cout<<ret[row][col]<<" ";
-
-      }
-cout<<endl;
+    if(length<1||height<1){
+      cout<<"invalid size"<<endl;
+      return 0;
     }
-  return ret;
-}else{
-  cout<<"bad user"<<endl;
-  return 0;
-}
+    int **image = new int*[height];
+    for(int row=0; row<height; row++){
+      //set the current row of the returning array to a new array for the data in the row
+      image[row] = new int[length];
+      for(int col=0; col<length; col++){
+        inputfile>>image[row][col];
+        if(image[row][col] < 0 || image[row][col] > 255)
+        {
+          cout<<"invalid value in image"<<endl;
+          free(image, length, row);
+          return 0;
+        }
+      }
+    }
+    return image;
+  }else{
+    cout<<"bad user"<<endl;
+    return 0;
+  }
 }
 
 /**
@@ -86,7 +99,9 @@ cout<<endl;
 */
 void save(string imageFile, int **image, int length, int height)
 {
-  //ofstream myfile.open;
+  ofstream outputfile(imageFile.c_str());
+  outputfile<<image<<"\t";
+  outputfile.close();
 }
 
 /**
@@ -94,6 +109,12 @@ void save(string imageFile, int **image, int length, int height)
 */
 int **crop(int **image, int length, int height, int cropRowStart, int cropColStart, int cropLength, int cropHeight)
 {
+
+  for(int i=cropRowStart; i<cropHeight, i++){
+    for(int j=cropColStart j<cropLength, j++){
+
+    }
+  }
   return 0;
 }
 
@@ -102,6 +123,9 @@ int **crop(int **image, int length, int height, int cropRowStart, int cropColSta
 */
 int **upSample(int **image, int length, int height, int &upLength, int &upHeight)
 {
+  upLength = 2*length;
+  upHeight = 2*height;
+  image=new *int[upHeight][upLength];
   return 0;
 }
 
@@ -127,11 +151,23 @@ void invert(int **image, int length, int height)
 */
 void show(int **image, int length, int height)
 {
+  for(int row=0; row<height; row++){
+    for(int col=0; col<length; col++){
+        cout<<image[row][col]<<"\t";
+      }
+  cout<<endl;
+  }
 }
+
 
 /**
 * Frees the memory pointed by image pointer.
 */
 void free(int **image, int &length, int &height)
 {
+  for(int row=0; row<height; row++){
+      delete[] image[row];
+      }
+  delete[] image;
+
 }
