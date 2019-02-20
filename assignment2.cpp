@@ -50,23 +50,49 @@ void free(int **image, int &length, int &height);
 
 int main()
 {
-  int length;
+  int length ;
   int height;
+  int upHeight;
+  int upLength;
+  int cropHeight =5;
+  int cropLength = 4;
+  int goodcrop = 3;
+  //int badCrop =6;
+  int downHeight;
+  int downLength;
 
-//  const string filename = "./resource/image.txt";
-  const string filename = "./resource/bad.txt";
+
+  const string filename = "./resource/image.txt";
+//  const string filename = "./resource/bad.txt";
   int **image = load(filename,length, height);
 if(image!=0){
   show(image, length, height);
 }
+cout<<endl;
+//crop(image, length, height, badCrop , badCrop , cropHeight , cropLength);
 
-
+int **croppedImage = crop(image, length, height, goodcrop , goodcrop , cropHeight , cropLength);
+show(croppedImage, cropLength, cropHeight);
+save("./resource/cropped.txt", croppedImage, cropLength, cropHeight);
+cout<<endl;
+int **upImage = upSample(image, length, height, upLength, upHeight);
+show(upImage, upLength, upHeight);
+save("./resource/upsampled.txt", upImage, upLength, upHeight);
+cout<<endl;
+//int **downImage =downSample(upImage, length, height, downLength, downHeight);
+//show(downImage, downLength, downHeight);
+//save("./resource/downsampled.txt",downImage, downLength, downHeight);
+invert(image, length , height);
+show(image, length, height);
+save("./resource/Inverted.txt", image, length, height);
 }
+
 
 int **load(string imageFile, int &length, int &height)
 {
   ifstream inputfile(imageFile.c_str());
   if(inputfile.is_open()){
+
     inputfile >> length; //cin>>length
     inputfile >> height;
     if(length<1||height<1){
@@ -110,12 +136,19 @@ void save(string imageFile, int **image, int length, int height)
 int **crop(int **image, int length, int height, int cropRowStart, int cropColStart, int cropLength, int cropHeight)
 {
 
-  for(int i=cropRowStart; i<cropHeight, i++){
-    for(int j=cropColStart j<cropLength, j++){
+//  cout<<"in crop"<<endl;
+  int **croppedImage = new int*[cropLength];
+  for(int row = 0; row < cropLength; row++){
+    croppedImage[row] = new int[cropHeight];
+  }
 
+
+  for(int i = 0; i < cropLength; i++){
+      for(int j = 0; j < cropHeight; j++){
+        croppedImage[i][j] = image[cropRowStart + i][cropColStart + j];
     }
   }
-  return 0;
+  return croppedImage;
 }
 
 /**
@@ -123,10 +156,24 @@ int **crop(int **image, int length, int height, int cropRowStart, int cropColSta
 */
 int **upSample(int **image, int length, int height, int &upLength, int &upHeight)
 {
-  upLength = 2*length;
-  upHeight = 2*height;
-  image=new *int[upHeight][upLength];
-  return 0;
+upLength = 2*length;
+upHeight = 2*height;
+
+  int **upImage = new int*[upHeight];
+  for(int row=0;row<upHeight; row++)
+  {
+  upImage[row] = new int[upLength];
+  }
+    for(int i = 0; i < height; i++){
+      for(int j = 0; j <length; j++){
+        upImage[2*i][2*j] = image[i][j];
+        upImage[2*i][2*j+1] = image[i][j];
+        upImage[2*i+1][2*j] = image[i][j];
+        upImage[2*i+1][2*j+1] =image[i][j];
+      }
+
+    }
+  return upImage;
 }
 
 /**
@@ -135,7 +182,25 @@ int **upSample(int **image, int length, int height, int &upLength, int &upHeight
 */
 int **downSample(int **image, int length, int height, int &downLength, int &downHeight)
 {
-  return 0;
+  downLength = 2/length;
+  downHeight = 2/height;
+
+    int **downImage = new int*[downHeight];
+    for(int row=0;row<downHeight; row++)
+    {
+    downImage[row] = new int[downLength];
+    }
+      for(int i = 0; i < height; i++){
+        cout<<"inside first loop"<<endl;
+        cout<<"i= " <<i <<endl;
+        for(int j = 0; j <length; j++){
+          cout<<"inside second loop"<<endl;
+          cout<<"j= "<<j<<endl;
+          downImage[i][j] = image[i*2][j*2];
+        }
+
+      }
+    return downImage;
 }
 
 /**
@@ -143,9 +208,13 @@ int **downSample(int **image, int length, int height, int &downLength, int &down
 */
 void invert(int **image, int length, int height)
 {
+  for(int i=0; i<height; i++){
+    for(int j = 0; j < length; j++){
+          image[i][j] = 255-image[i][j];
 
+        }
+      }
 }
-
 /**
 * Shows the image data in separate lines.
 */
