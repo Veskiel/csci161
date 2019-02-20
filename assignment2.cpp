@@ -57,7 +57,7 @@ int main()
   int cropHeight =5;
   int cropLength = 4;
   int goodcrop = 3;
-  //int badCrop =6;
+  int badCrop =6;
   int downHeight;
   int downLength;
 
@@ -69,8 +69,8 @@ int main()
     show(image, length, height);
   }
   cout<<endl;
-  //crop(image, length, height, badCrop , badCrop , cropHeight , cropLength);
-
+  crop(image, length, height, badCrop , badCrop , cropHeight , cropLength);
+cout<<endl;
   int **croppedImage = crop(image, length, height, goodcrop , goodcrop , cropHeight , cropLength);
   show(croppedImage, cropLength, cropHeight);
   save("./resource/cropped.txt", croppedImage, cropLength, cropHeight);
@@ -87,7 +87,6 @@ int main()
   show(image, length, height);
   save("./resource/Inverted.txt", image, length, height);
 }
-
 
 int **load(string imageFile, int &length, int &height)
 {
@@ -148,19 +147,20 @@ int **crop(int **image, int length, int height, int cropRowStart, int cropColSta
     croppedImage[row] = new int[cropHeight];
   }
 
-if(croppedImage <=length||croppedImage<=height){
+if(cropRowStart*cropColStart + cropHeight*cropLength > length*height/2){
+  cout<<"the image goes past the bounds of the array"<<endl;
+  return 0;
+
+
+}else{
   for(int i = 0; i < cropLength; i++){
     for(int j = 0; j < cropHeight; j++){
       croppedImage[i][j] = image[cropRowStart + i][cropColStart + j];
     }
   }
-}else{
-  cout<<"the image goes past the bounds of the array"
-  return 0;
-}
   return croppedImage;
+  }
 }
-
 /**
 * Up-samples the image by a factor of 2.
 */
